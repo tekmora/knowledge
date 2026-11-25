@@ -534,7 +534,7 @@ func finishPublishMaterialization(target, staging string, status *publishStatus,
 }
 
 func preparePublishTarget(target, staging string) error {
-	if err := os.MkdirAll(target, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
+	if err := os.MkdirAll(target, publishDirMode); err != nil { // #nosec G301 -- the publish root stays 0o755 so later publishes can unseal and replace its sealed state, trust and retrieval trees; others may only read and traverse it, and the uid-65532 server needs no write.
 		return fmt.Errorf("create publish target: %w", err)
 	}
 	if err := clearPublishedTrees(target); err != nil {
@@ -543,7 +543,7 @@ func preparePublishTarget(target, staging string) error {
 	if err := os.RemoveAll(staging); err != nil {
 		return err
 	}
-	return os.MkdirAll(staging, publishDirMode) // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
+	return os.MkdirAll(staging, publishDirMode) // #nosec G301 -- private staging root, removed after every publish; only its payload trees move into the target, where sealing sets them to 0o555.
 }
 
 func fetchAndExtractPublishBundle(configuration config, staging string) (*publishBundleManifest, string, error) {
@@ -703,7 +703,7 @@ func extractPublishBundle(bundlePath, payload string) (*publishBundleManifest, e
 		return nil, err
 	}
 	defer file.Close()
-	if err := os.MkdirAll(payload, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
+	if err := os.MkdirAll(payload, publishDirMode); err != nil { // #nosec G301 -- payload root inside staging, removed after every publish; its state, trust and retrieval trees move into the target, where sealing sets them to 0o555.
 		return nil, err
 	}
 	reader := tar.NewReader(file)
@@ -805,7 +805,7 @@ func readBundleManifest(reader *tar.Reader) (*publishBundleManifest, error) {
 
 func extractBundleEntry(reader io.Reader, payload string, entry publishBundleEntry) error {
 	destination := filepath.Join(payload, filepath.FromSlash(entry.Path))
-	if err := os.MkdirAll(filepath.Dir(destination), publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
+	if err := os.MkdirAll(filepath.Dir(destination), publishDirMode); err != nil { // #nosec G301 -- directory inside a payload tree; that tree moves into the target, where sealing sets it to 0o555 before the uid-65532 server reads it.
 		return err
 	}
 	file, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600) // #nosec G304 -- path comes from the operator publish configuration or the validated bundle entry and private staging directory.
@@ -869,7 +869,7 @@ func materializeTrustRoot(source, directory string) error {
 	if _, err := os.Stat(directory); err == nil {
 		return errors.New("bundle supplied its own trust directory")
 	}
-	if err := os.MkdirAll(directory, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
+	if err := os.MkdirAll(directory, publishDirMode); err != nil { // #nosec G301 -- trust directory inside the payload; it moves into the target, where sealing sets it to 0o555 before the uid-65532 server reads it.
 		return err
 	}
 	destination := filepath.Join(directory, publishTrustFileName)
