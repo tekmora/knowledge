@@ -533,6 +533,7 @@ func finishPublishMaterialization(target, staging string, status *publishStatus,
 	return cause
 }
 
+// preparePublishTarget creates the publish root, clears its published trees and recreates an empty staging directory.
 func preparePublishTarget(target, staging string) error {
 	if err := os.MkdirAll(target, publishDirMode); err != nil { // #nosec G301 -- the publish root stays 0o755 so later publishes can unseal and replace its sealed state, trust and retrieval trees; others may only read and traverse it, and the uid-65532 server needs no write.
 		return fmt.Errorf("create publish target: %w", err)
@@ -803,6 +804,7 @@ func readBundleManifest(reader *tar.Reader) (*publishBundleManifest, error) {
 	return &manifest, nil
 }
 
+// extractBundleEntry writes one bundle entry under payload, checks its size and digest against the manifest, and makes it read-only.
 func extractBundleEntry(reader io.Reader, payload string, entry publishBundleEntry) error {
 	destination := filepath.Join(payload, filepath.FromSlash(entry.Path))
 	if err := os.MkdirAll(filepath.Dir(destination), publishDirMode); err != nil { // #nosec G301 -- directory inside a payload tree; that tree moves into the target, where sealing sets it to 0o555 before the uid-65532 server reads it.
