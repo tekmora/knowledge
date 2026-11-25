@@ -27,9 +27,11 @@ import knowledge_registry as kr
 
 OBSERVED_AT = "2026-07-17T12:00:00Z"
 NEXT_OBSERVED_AT = "2026-07-17T12:00:01Z"
+GIT_TIMEOUT_SECONDS = 60
 
 
 def run_git(root: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
+    """Run git in root with an isolated home and locale."""
     return subprocess.run(
         ["/usr/bin/git", *arguments],
         cwd=root,
@@ -44,6 +46,7 @@ def run_git(root: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
         check=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        timeout=GIT_TIMEOUT_SECONDS,
     )
 
 
@@ -260,12 +263,14 @@ jobs:
 
     @staticmethod
     def current_capture_generator() -> dict[str, object]:
+        """Describe the live capture generator: HEAD and each source hash."""
         commit = (
             subprocess.run(
                 ["/usr/bin/git", "rev-parse", "HEAD"],
                 cwd=REPO_ROOT,
                 check=True,
                 stdout=subprocess.PIPE,
+                timeout=GIT_TIMEOUT_SECONDS,
             )
             .stdout.decode()
             .strip()

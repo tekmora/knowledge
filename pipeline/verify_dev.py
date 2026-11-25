@@ -31,7 +31,11 @@ QUERIES = [
 ]
 
 def run(cmd):
-    return subprocess.run(cmd, capture_output=True, text=True)
+    """Run cmd under a 600-second deadline; a timeout returns a failed result."""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as error:
+        return subprocess.CompletedProcess(cmd, 1, stdout='', stderr=f'{cmd[1]} timed out after {error.timeout} seconds')
 
 def jparse(r):
     for s in (r.stderr, r.stdout):
@@ -48,7 +52,12 @@ def jparse(r):
 
 results = []
 for query, expect in QUERIES:
-    subprocess.run(['rm', '-rf', DEV + '/qsig-dev'])
+    try:
+        subprocess.run(['rm', '-rf', DEV + '/qsig-dev'], timeout=60)
+    except subprocess.TimeoutExpired as error:
+        results.append({'query': query, 'expect': expect, 'top': 'SIGNAL_FAIL',
+                        'ok': False, 'err': f'rm timed out after {error.timeout} seconds'})
+        continue
     r = run([BIN, 'materialize-query-signal', '--hybrid-candidate', HYB, '--hybrid-candidate-sha256', HSHA,
              '--dense-artifact', DA, '--dense-artifact-sha256', DSHA, '--query', query,
              '--query-instruction', QINST, '--embedding-model', 'qwen3-embed', '--store', DEV + '/qsig-dev'])

@@ -37,7 +37,11 @@ def fail(msg):
     sys.exit(0)
 
 def run(cmd):
-    return subprocess.run(cmd, capture_output=True, text=True)
+    """Run cmd under a 600-second deadline; a timeout fails the ingest."""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as error:
+        fail(f'{os.path.basename(cmd[0])} timed out after {error.timeout} seconds')
 
 def jparse(r):
     """These binaries print their result JSON to stderr; try both streams."""

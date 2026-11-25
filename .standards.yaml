@@ -30,25 +30,60 @@ register:
         selector: invariants.*
 exceptions:
   - rule: HISS-11
+    path: tools/knowledge-registry/tests/test_knowledge_registry.py
+    reason: category D; the fixtures at lines 600, 1318 and 3940 hold floating image references (nginx:latest, app2:main, review:v1) on purpose, because these tests assert that the registry reports mutable tags as typed gaps; revisit when the registry tests build the references from parts the scanner reads as test data
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
+  - rule: HISS-02
+    path: tools/knowledge-registry/p1-src03-acquisition-runner/verify_execution_manifest.py
+    reason: category D; the execution manifest beside this file pins its exact bytes (sha256 and size) and TestExecutionManifestBindsExactRepositoryBytes refuses any edit, so the go version subprocess.run at line 353 keeps no explicit timeout; follow-up unit knowledge-verifier-manifest-reissue reissues the manifest chain with that deadline, then remove this entry
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
+  - rule: HISS-12
+    path: tools/knowledge-registry/p1-src03-acquisition-runner/contract.go
+    tool: generic-api-key
+    reason: category D; gitleaks reads the git object ids in the tree and blob path bindings at lines 191, 199 and 201 as API keys, but they are public content hashes of the pinned Kubernetes sources; revisit when the engine gitleaks configuration allows 40-hex git object ids
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
+  - rule: go-test-netns
+    path: tools/knowledge-retrieval/go.mod
+    reason: category D; the lifecycle signing tests run the production ssh-keygen owner check (validateSSHKeygenBinary in lifecycle_signing.go), which needs uid 0 to own /usr/bin/ssh-keygen and every parent directory, while the race stage's bubblewrap user namespace shows host root as the overflow uid, so its signing tests fail on the wrapper alone; the module's only test server is the httptest stub in query_signal_materialize_test.go, and CI runs the same race tests outside the wrapper; revisit when the engine wrapper keeps host root visible to stat
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
+  - rule: HISS-11
     path: .github/workflows/release.yml
     reason: adoption found the release workflows short of the declared supply chain (SLSA Build Level 3 declared, Level 0 measured; enforce_cosign without a cosign signing step; require_sbom without an SBOM step); raise them as docs/guides/releasing.md in Praetor describes, then remove this entry
     expires: "2027-01-21"
+    category: A
+    entered: "2026-10-23"
   - rule: declared-linters
     tool: gitleaks
     reason: adoption scaffolds no CI job for gitleaks declared by facet "security:high"; run it in a workflow, or remove this entry
     expires: "2027-01-21"
+    category: A
+    entered: "2026-10-23"
   - rule: declared-linters
     tool: govet
     reason: adoption scaffolds no CI job for govet declared by profile "template-seed"; run it in a workflow, or remove this entry
     expires: "2027-01-21"
+    category: A
+    entered: "2026-10-23"
   - rule: declared-linters
     tool: semgrep
     reason: adoption scaffolds no CI job for semgrep declared by profile "template-seed", facet "agent:sandboxed"; run it in a workflow, or remove this entry
     expires: "2027-01-21"
+    category: A
+    entered: "2026-10-23"
   - rule: declared-linters
     tool: trivy
     reason: adoption scaffolds no CI job for trivy declared by facet "security:high"; run it in a workflow, or remove this entry
     expires: "2027-01-21"
+    category: A
+    entered: "2026-10-23"
   - rule: gosec
     path: tools/knowledge-registry/p1-src03-acquisition-runner/runner.go
     gosec_rules: [G401, G505, G704]
@@ -112,3 +147,11 @@ exceptions:
     category: D
     entered: "2026-10-23"
     expires: "2027-02-20"
+overrides:
+  branch_protection:
+    # Solo-repository policy (fleet rule): one maintainer and no review bot
+    # can approve. Restore independent when a second maintainer or a review
+    # bot can.
+    review_mode: single_maintainer
+    # Declared at its live value; the forge default is the stricter one.
+    require_extra_approval_for_unattributed_changes: true
