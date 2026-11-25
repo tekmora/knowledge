@@ -42,6 +42,7 @@ test: build
 	@cd tools/knowledge-snapshot && go test -p 4 -v -count=1 ./...
 	@cd tools/knowledge-retrieval && go test -p 4 -v -count=1 -run 'Test(BM25|Dense|Current|Hybrid|Lifecycle|Paired|Situating|FineSpan|SharedCanonicalJSONConformance)' ./...
 	@python3 -m pytest -q tools/knowledge-dogfood-evidence/tests/test_fail_closed.py
+	@python3 -m pytest -q tools/knowledge-registry/tests/test_subprocess_deadlines.py
 	@python3 -m pytest -q apps/ai/kb-mcp/files/test_mcpo_proxy.py
 	@python3 tools/knowledge-registry/tests/test_canonical_json_conformance.py
 	@helm lint apps/ai/kb-mcp

@@ -19,6 +19,7 @@ LINEAGE = DEV + '/lineage-set-dev.json'
 DENSE_GLOB = DEV + '/dense-dev/dense-artifacts/sha256/*/*.json'
 QUERY_INSTRUCTION = 'Given a web search query, retrieve relevant passages that answer the query'
 PROTOCOL = '2024-11-05'
+QUERY_TIMEOUT_SECONDS = 600
 
 
 def ensure_endpoint():
@@ -84,22 +85,28 @@ def search(query, limit=5):
     if not ensure_endpoint():
         return {'error': 'embedding endpoint unreachable (could not reach or port-forward svc/qwen3-embed-cpu -n ai /v1/embeddings)'}
     tmp = tempfile.mkdtemp(prefix='mcp-devqsig-')
-    r = subprocess.run([BIN, 'materialize-query-signal', '--hybrid-candidate', cfg['hyb'],
-                        '--hybrid-candidate-sha256', cfg['hyb_sha'], '--dense-artifact', cfg['dense'],
-                        '--dense-artifact-sha256', cfg['dense_sha'], '--query', query,
-                        '--query-instruction', QUERY_INSTRUCTION, '--embedding-model', 'qwen3-embed',
-                        '--store', tmp], capture_output=True, text=True)
+    try:
+        r = subprocess.run([BIN, 'materialize-query-signal', '--hybrid-candidate', cfg['hyb'],
+                            '--hybrid-candidate-sha256', cfg['hyb_sha'], '--dense-artifact', cfg['dense'],
+                            '--dense-artifact-sha256', cfg['dense_sha'], '--query', query,
+                            '--query-instruction', QUERY_INSTRUCTION, '--embedding-model', 'qwen3-embed',
+                            '--store', tmp], capture_output=True, text=True, timeout=QUERY_TIMEOUT_SECONDS)
+    except subprocess.TimeoutExpired as error:
+        return {'error': f'materialize-query-signal timed out after {error.timeout} seconds'}
     sig = _jparse(r)
     if not sig or 'artifact_path' not in sig:
         return {'error': 'query embedding failed: ' + (r.stderr or r.stdout)[:200]}
     sp = sig['artifact_path']; ssha = 'sha256:' + hashlib.sha256(open(sp, 'rb').read()).hexdigest()
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    r = subprocess.run([BIN, 'hybrid-query', '--hybrid-candidate', cfg['hyb'], '--hybrid-candidate-sha256', cfg['hyb_sha'],
-                        '--store', STORE, '--evidence-store', EVID, '--admission-policy', cfg['pol'],
-                        '--admission-policy-sha256', cfg['pol_sha'], '--lineage-set', LINEAGE,
-                        '--query-artifact', sp, '--query-artifact-sha256', ssha, '--query', query,
-                        '--principal-scope', 'public', '--as-of', now, '--rerank-window', '0',
-                        '--limit', str(max(1, min(int(limit), 20)))], capture_output=True, text=True)
+    try:
+        r = subprocess.run([BIN, 'hybrid-query', '--hybrid-candidate', cfg['hyb'], '--hybrid-candidate-sha256', cfg['hyb_sha'],
+                            '--store', STORE, '--evidence-store', EVID, '--admission-policy', cfg['pol'],
+                            '--admission-policy-sha256', cfg['pol_sha'], '--lineage-set', LINEAGE,
+                            '--query-artifact', sp, '--query-artifact-sha256', ssha, '--query', query,
+                            '--principal-scope', 'public', '--as-of', now, '--rerank-window', '0',
+                            '--limit', str(max(1, min(int(limit), 20)))], capture_output=True, text=True, timeout=QUERY_TIMEOUT_SECONDS)
+    except subprocess.TimeoutExpired as error:
+        return {'error': f'hybrid-query timed out after {error.timeout} seconds'}
     d = _jparse(r)
     if not d or d.get('result_state') != 'ok':
         return {'error': 'retrieval failed: ' + json.dumps(d)[:200] if d else (r.stderr or r.stdout)[:200]}

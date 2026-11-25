@@ -29,7 +29,7 @@ def distinctive_topic(e):
     return topic(sorted(cands)[0]) if cands else ''
 
 def run(cmd):
-    return subprocess.run(cmd, capture_output=True, text=True)
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
 
 def jparse(r):
     for s in (r.stderr, r.stdout):
@@ -49,20 +49,28 @@ for e in ls['lineages']:
     slug = e['authority_id'].split(':')[-2]
     t = distinctive_topic(e)
     query = f'{slug} {t}'.strip()
-    subprocess.run(['rm', '-rf', BASE + '/qsig-eval'])
-    r = run([BIN, 'materialize-query-signal', '--hybrid-candidate', HYB, '--hybrid-candidate-sha256', HSHA,
-             '--dense-artifact', DA, '--dense-artifact-sha256', DSHA, '--query', query,
-             '--query-instruction', 'Given a web search query, retrieve relevant passages that answer the query',
-             '--embedding-model', 'qwen3-embed', '--store', BASE + '/qsig-eval'])
+    try:
+        subprocess.run(['rm', '-rf', BASE + '/qsig-eval'], timeout=60)
+        r = run([BIN, 'materialize-query-signal', '--hybrid-candidate', HYB, '--hybrid-candidate-sha256', HSHA,
+                 '--dense-artifact', DA, '--dense-artifact-sha256', DSHA, '--query', query,
+                 '--query-instruction', 'Given a web search query, retrieve relevant passages that answer the query',
+                 '--embedding-model', 'qwen3-embed', '--store', BASE + '/qsig-eval'])
+    except subprocess.TimeoutExpired:
+        results.append({'slug': slug, 'query': query, 'top': 'SIGNAL_FAIL', 'ok': False})
+        continue
     sig = jparse(r)
     if not sig or 'artifact_path' not in sig:
         results.append({'slug': slug, 'query': query, 'top': 'SIGNAL_FAIL', 'ok': False}); continue
     sp = sig['artifact_path']; ssha = 'sha256:' + hashlib.sha256(open(sp, 'rb').read()).hexdigest()
-    r = run([BIN, 'hybrid-query', '--hybrid-candidate', HYB, '--hybrid-candidate-sha256', HSHA,
-             '--store', BASE + '/retrieval-shared-full', '--evidence-store', BASE + '/evidence-merged-full',
-             '--admission-policy', POL, '--admission-policy-sha256', PSHA, '--lineage-set', BASE + '/lineage-set-full.json',
-             '--query-artifact', sp, '--query-artifact-sha256', ssha, '--query', query,
-             '--principal-scope', 'public', '--as-of', '2026-07-18T12:00:00Z', '--rerank-window', '0', '--limit', '1'])
+    try:
+        r = run([BIN, 'hybrid-query', '--hybrid-candidate', HYB, '--hybrid-candidate-sha256', HSHA,
+                 '--store', BASE + '/retrieval-shared-full', '--evidence-store', BASE + '/evidence-merged-full',
+                 '--admission-policy', POL, '--admission-policy-sha256', PSHA, '--lineage-set', BASE + '/lineage-set-full.json',
+                 '--query-artifact', sp, '--query-artifact-sha256', ssha, '--query', query,
+                 '--principal-scope', 'public', '--as-of', '2026-07-18T12:00:00Z', '--rerank-window', '0', '--limit', '1'])
+    except subprocess.TimeoutExpired:
+        results.append({'slug': slug, 'query': query, 'top': 'NONE', 'ok': False})
+        continue
     d = jparse(r)
     res = (d.get('results') if d else None) or []
     top = (res[0]['evidence'].get('component_id', '?').split('/')[-1]) if res else 'NONE'

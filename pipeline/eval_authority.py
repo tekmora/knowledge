@@ -37,7 +37,10 @@ def jparse(r):
     return None
 
 def run(cmd):
-    return subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as error:
+        out({'ok': False, 'slug': slug, 'error': f'{cmd[1]} timed out after {error.timeout} seconds'})
 
 def out(d):
     print('RESULT=' + json.dumps(d)); sys.exit(0)
@@ -48,7 +51,10 @@ if not ent:
     out({'ok': False, 'slug': slug, 'error': 'no lineage entry'})
 e = ent[0]
 STORE = BASE + f'/eval-{slug}-{PTAG}'; DSTORE = BASE + f'/emb-eval-{slug}-{PTAG}'
-subprocess.run(['rm', '-rf', STORE, DSTORE])
+try:
+    subprocess.run(['rm', '-rf', STORE, DSTORE], timeout=60)
+except subprocess.TimeoutExpired as error:
+    out({'ok': False, 'slug': slug, 'error': f'rm timed out after {error.timeout} seconds'})
 
 # 1. single-authority lexical build (as-of == admission evaluated_at)
 r = run([RET, 'build', '--snapshot-manifest', e['snapshot_manifest'], '--evidence-manifest', e['evidence_manifest'],

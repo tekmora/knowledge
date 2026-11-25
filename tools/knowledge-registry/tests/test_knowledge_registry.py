@@ -27,6 +27,7 @@ import knowledge_registry as kr
 
 OBSERVED_AT = "2026-07-17T12:00:00Z"
 NEXT_OBSERVED_AT = "2026-07-17T12:00:01Z"
+GIT_TIMEOUT_SECONDS = 60
 
 
 def run_git(root: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
@@ -44,6 +45,7 @@ def run_git(root: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
         check=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        timeout=GIT_TIMEOUT_SECONDS,
     )
 
 
@@ -266,6 +268,7 @@ jobs:
                 cwd=REPO_ROOT,
                 check=True,
                 stdout=subprocess.PIPE,
+                timeout=GIT_TIMEOUT_SECONDS,
             )
             .stdout.decode()
             .strip()

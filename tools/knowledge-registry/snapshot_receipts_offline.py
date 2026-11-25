@@ -158,6 +158,7 @@ def git_commit_object(repository: str, ref: str) -> tuple[str, bytes]:
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            timeout=60,
         ).stdout
 
     commit = run("rev-parse", "--verify", f"{ref}^{{commit}}").decode().strip()

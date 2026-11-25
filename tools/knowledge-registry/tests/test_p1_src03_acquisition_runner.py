@@ -18,6 +18,7 @@ RUNNER_ROOT = REPO_ROOT / "tools/knowledge-registry/p1-src03-acquisition-runner"
 EXECUTION_VERIFIER = RUNNER_ROOT / "verify_execution_manifest.py"
 SCHEMA_ROOT = REPO_ROOT / "knowledge/registry/schemas"
 TOOL_ROOT = REPO_ROOT / "tools/knowledge-registry"
+GO_TIMEOUT_SECONDS = 600
 sys.path.insert(0, str(TOOL_ROOT))
 
 import knowledge_registry as registry
@@ -102,6 +103,7 @@ class P1SRC03AcquisitionSchemaTest(unittest.TestCase):
                 cwd=RUNNER_ROOT,
                 check=True,
                 capture_output=True,
+                timeout=GO_TIMEOUT_SECONDS,
             ).stdout
         )
         self.validator("source-acquisition-contract-v2.schema.json").validate(contract)
@@ -135,6 +137,7 @@ class P1SRC03AcquisitionSchemaTest(unittest.TestCase):
                 env=environment,
                 check=True,
                 capture_output=True,
+                timeout=GO_TIMEOUT_SECONDS,
             )
             receipt_paths = list((output_root / "receipts").glob("*.json"))
             proposal_paths = list((output_root / "inventory-proposals").glob("*.json"))
@@ -292,6 +295,7 @@ class P1SRC03AcquisitionSchemaTest(unittest.TestCase):
                     check=False,
                     capture_output=True,
                     text=True,
+                    timeout=60,
                 )
                 self.assertNotEqual(0, completed.returncode)
                 self.assertIn(wanted, completed.stderr)
