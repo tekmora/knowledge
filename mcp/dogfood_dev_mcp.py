@@ -81,6 +81,7 @@ def _jparse(r):
 
 
 def search(query, limit=5):
+    """Return the dev-corpus hits for query, or an error dict on failure."""
     cfg = _load()
     if not ensure_endpoint():
         return {'error': 'embedding endpoint unreachable (could not reach or port-forward svc/qwen3-embed-cpu -n ai /v1/embeddings)'}

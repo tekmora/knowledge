@@ -16,9 +16,9 @@ integrity, and the debt ratchet.
 generated agent context against `AGENTS.md`.
 
 **Debt Baseline**: `.standards-baseline.json` anchors the debt ratchet at
-540 recorded infractions; audit forbids growth.
+527 recorded infractions; audit forbids growth.
 
-[praetor-hiss-badge]: https://img.shields.io/badge/Standards-HISS%20Adopted%20(540%20baselined)-yellow
+[praetor-hiss-badge]: https://img.shields.io/badge/Standards-HISS%20Adopted%20(527%20baselined)-yellow
 [praetor-hiss-agents]: https://github.com/cordanaLLM/knowledge/blob/HEAD/AGENTS.md
 <!-- praetor:readme-governance:end -->
 

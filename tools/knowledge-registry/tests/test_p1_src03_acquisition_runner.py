@@ -97,6 +97,7 @@ class P1SRC03AcquisitionSchemaTest(unittest.TestCase):
         )
 
     def test_runner_contract_receipt_and_proposal_validate_v2(self) -> None:
+        """The runner contract, receipt and proposal validate as v2."""
         contract = load_strict(
             subprocess.run(
                 ["go", "run", ".", "--print-contract"],
@@ -249,6 +250,7 @@ class P1SRC03AcquisitionSchemaTest(unittest.TestCase):
     def test_external_execution_verifier_rejects_readdressed_scope_drift(
         self,
     ) -> None:
+        """The verifier refuses a manifest with readdressed scope drift."""
         manifest = load_strict((RUNNER_ROOT / "execution-manifest.json").read_bytes())
         for name, mutate, wanted in (
             (

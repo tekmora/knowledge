@@ -31,6 +31,7 @@ QUERIES = [
 ]
 
 def run(cmd):
+    """Run cmd under a 600-second deadline; a timeout returns a failed result."""
     try:
         return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired as error:

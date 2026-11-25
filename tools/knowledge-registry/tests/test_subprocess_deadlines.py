@@ -39,6 +39,7 @@ EXCEPTION_FIELD = re.compile(r"^    (\w+): (.*)$", re.MULTILINE)
 
 
 def declared_exceptions(rule):
+    """Map each path .standards.yaml excepts from rule to its expiry."""
     text = (REPO_ROOT / ".standards.yaml").read_text(encoding="utf-8")
     declared = {}
     for entry in EXCEPTION_ENTRY.finditer(text):
@@ -54,6 +55,7 @@ def declared_exceptions(rule):
 
 
 def subprocess_run_calls(tree):
+    """Yield each subprocess.run call in tree, by module or imported name."""
     aliases = {
         name.asname or name.name
         for node in ast.walk(tree)
@@ -79,6 +81,7 @@ def subprocess_run_calls(tree):
 
 
 def run_or_timeout(command, *, timeout, timeout_command, stdout, **kwargs):
+    """Fake subprocess.run: time out on timeout_command, else return stdout."""
     if timeout_command in command[:2]:
         raise subprocess.TimeoutExpired(command, timeout)
     return subprocess.CompletedProcess(command, 0, stdout=stdout, stderr="")
@@ -86,6 +89,7 @@ def run_or_timeout(command, *, timeout, timeout_command, stdout, **kwargs):
 
 class SubprocessDeadlineTests(unittest.TestCase):
     def test_subprocess_runs_have_timeouts(self):
+        """Every subprocess.run in the deadline paths sets a timeout."""
         for relative in DEADLINE_PATHS:
             with self.subTest(path=relative):
                 source = (REPO_ROOT / relative).read_text(encoding="utf-8")
@@ -105,6 +109,7 @@ class SubprocessDeadlineTests(unittest.TestCase):
                         )
 
     def test_deadline_exceptions_are_declared(self):
+        """Each path left out of the check has a live HISS-02 exception."""
         declared = declared_exceptions("HISS-02")
         for relative in DEADLINE_EXCEPTIONS:
             with self.subTest(path=relative):
@@ -113,6 +118,7 @@ class SubprocessDeadlineTests(unittest.TestCase):
                 self.assertGreaterEqual(declared[relative], date.today().isoformat())
 
     def test_mcp_search_timeouts_return_errors(self):
+        """A timed-out command in either MCP search returns its error."""
         for name in ("dogfood_dev_mcp", "dogfood_mcp"):
             path = REPO_ROOT / "mcp" / f"{name}.py"
             spec = importlib.util.spec_from_file_location(name, path)
@@ -149,6 +155,7 @@ class SubprocessDeadlineTests(unittest.TestCase):
                         )
 
     def test_served_routing_records_timeouts_as_failed_queries(self):
+        """A timed-out query in served routing counts as a failed query."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for relative in (

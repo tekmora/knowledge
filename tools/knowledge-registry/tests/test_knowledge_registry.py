@@ -31,6 +31,7 @@ GIT_TIMEOUT_SECONDS = 60
 
 
 def run_git(root: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
+    """Run git in root with an isolated home and locale."""
     return subprocess.run(
         ["/usr/bin/git", *arguments],
         cwd=root,
@@ -262,6 +263,7 @@ jobs:
 
     @staticmethod
     def current_capture_generator() -> dict[str, object]:
+        """Describe the live capture generator: HEAD and each source hash."""
         commit = (
             subprocess.run(
                 ["/usr/bin/git", "rev-parse", "HEAD"],

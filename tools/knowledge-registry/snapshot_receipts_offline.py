@@ -151,7 +151,9 @@ def receipt_row(
 
 
 def git_commit_object(repository: str, ref: str) -> tuple[str, bytes]:
+    """Return the commit id ref resolves to and its raw commit object."""
     def run(*arguments: str) -> bytes:
+        """Run git in the repository and return stdout; 60-second deadline."""
         return subprocess.run(
             ["/usr/bin/git", *arguments],
             cwd=repository,

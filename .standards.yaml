@@ -41,6 +41,13 @@ exceptions:
     expires: "2027-03-25"
     category: D
     entered: "2026-11-25"
+  - rule: HISS-12
+    path: tools/knowledge-registry/p1-src03-acquisition-runner/contract.go
+    tool: generic-api-key
+    reason: category D; gitleaks reads the git object ids in the tree and blob path bindings at lines 191, 199 and 201 as API keys, but they are public content hashes of the pinned Kubernetes sources; revisit when the engine gitleaks configuration allows 40-hex git object ids
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
   - rule: HISS-11
     path: .github/workflows/release.yml
     reason: adoption found the release workflows short of the declared supply chain (SLSA Build Level 3 declared, Level 0 measured; enforce_cosign without a cosign signing step; require_sbom without an SBOM step); raise them as docs/guides/releasing.md in Praetor describes, then remove this entry
@@ -134,3 +141,11 @@ exceptions:
     category: D
     entered: "2026-10-23"
     expires: "2027-02-20"
+overrides:
+  branch_protection:
+    # Solo-repository policy (fleet rule): one maintainer and no review bot
+    # can approve. Restore independent when a second maintainer or a review
+    # bot can.
+    review_mode: single_maintainer
+    # Declared at its live value; the forge default is the stricter one.
+    require_extra_approval_for_unattributed_changes: true

@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generated_at": "2026-10-23T03:29:35Z",
+  "generated_at": "2026-11-25T14:51:18Z",
   "repository": "cordanaLLM/knowledge",
-  "commit_sha": "2ce03d8982cb978d8046811d6db0e30830f50e03",
-  "total_infractions": 540,
+  "commit_sha": "577b3752c8681fd1451dc0887b12433745524a4a",
+  "total_infractions": 527,
   "infractions": [
     {
       "rule_id": "HISS-04",
@@ -25,7 +25,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "pipeline/eval_authority.py",
-      "line_number": 43,
+      "line_number": 47,
       "message": "sys.exit ends the process from library code; return an error to the __main__ entry point instead",
       "anchor": "fn:out",
       "fingerprint": "pipeline/eval_authority.py:HISS-07:fn:out#1"
@@ -53,15 +53,6 @@
       "message": "sys.exit ends the process from library code; return an error to the __main__ entry point instead",
       "anchor": "fn:cmd_fetch",
       "fingerprint": "tools/bench/sde/sde.py:HISS-07:fn:cmd_fetch#1"
-    },
-    {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-adapter-v2/adapter.go",
-      "line_number": 219,
-      "symbol": "prepareBundle",
-      "message": "Function 'prepareBundle' (63 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:prepareBundle",
-      "fingerprint": "tools/knowledge-adapter-v2/adapter.go:HISS-04:fn:prepareBundle#1"
     },
     {
       "rule_id": "HISS-02",
@@ -199,7 +190,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-evidence/compiler.go",
-      "line_number": 450,
+      "line_number": 449,
       "symbol": "validateSnapshotManifest",
       "message": "Function 'validateSnapshotManifest' (117 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:validateSnapshotManifest",
@@ -208,7 +199,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-evidence/compiler.go",
-      "line_number": 568,
+      "line_number": 567,
       "symbol": "validateReviewAdmission",
       "message": "Function 'validateReviewAdmission' (73 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:validateReviewAdmission",
@@ -217,7 +208,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-evidence/compiler.go",
-      "line_number": 673,
+      "line_number": 672,
       "symbol": "verifyReviewBundle",
       "message": "Function 'verifyReviewBundle' (139 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:verifyReviewBundle",
@@ -226,7 +217,7 @@
     {
       "rule_id": "HISS-02",
       "file_path": "tools/knowledge-evidence/compiler.go",
-      "line_number": 1259,
+      "line_number": 1255,
       "symbol": "validateNoSymlinkPathExistingPrefix",
       "message": "Unbounded for loop without an exit condition (for {} / for ;; )",
       "anchor": "fn:validateNoSymlinkPathExistingPrefix",
@@ -235,9 +226,9 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-evidence/compiler.go",
-      "line_number": 1623,
+      "line_number": 1609,
       "symbol": "writeImmutableAtRoot",
-      "message": "Function 'writeImmutableAtRoot' (69 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
+      "message": "Function 'writeImmutableAtRoot' (67 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:writeImmutableAtRoot",
       "fingerprint": "tools/knowledge-evidence/compiler.go:HISS-04:fn:writeImmutableAtRoot#1"
     },
@@ -253,7 +244,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 196,
+      "line_number": 200,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:readCredentialForUID",
       "fingerprint": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go:HISS-07:fn:readCredentialForUID#1"
@@ -261,7 +252,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 299,
+      "line_number": 303,
       "symbol": "newBridgeRuntime",
       "message": "Function 'newBridgeRuntime' (63 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:newBridgeRuntime",
@@ -270,7 +261,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 319,
+      "line_number": 323,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:newBridgeRuntime",
       "fingerprint": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go:HISS-07:fn:newBridgeRuntime#1"
@@ -278,7 +269,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 324,
+      "line_number": 328,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:newBridgeRuntime",
       "fingerprint": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go:HISS-07:fn:newBridgeRuntime#2"
@@ -286,7 +277,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 384,
+      "line_number": 388,
       "symbol": "loadAggregateTools",
       "message": "Function 'loadAggregateTools' (68 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:loadAggregateTools",
@@ -295,7 +286,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 453,
+      "line_number": 457,
       "symbol": "loadAllowedTools",
       "message": "Function 'loadAllowedTools' (74 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:loadAllowedTools",
@@ -304,7 +295,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go",
-      "line_number": 530,
+      "line_number": 534,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:bridgeRuntime.close",
       "fingerprint": "tools/knowledge-mcp/cmd/cordana-knowledge-mcp-bridge/main.go:HISS-07:fn:bridgeRuntime.close#1"
@@ -312,7 +303,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 231,
+      "line_number": 232,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:caseOneLaneTimeout",
       "fingerprint": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go:HISS-07:fn:caseOneLaneTimeout#1"
@@ -320,7 +311,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 275,
+      "line_number": 276,
       "symbol": "caseTamper",
       "message": "Function 'caseTamper' (98 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:caseTamper",
@@ -329,7 +320,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 283,
+      "line_number": 284,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:caseTamper",
       "fingerprint": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go:HISS-07:fn:caseTamper#1"
@@ -337,7 +328,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 416,
+      "line_number": 417,
       "symbol": "caseACL",
       "message": "Function 'caseACL' (62 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:caseACL",
@@ -346,7 +337,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 516,
+      "line_number": 517,
       "symbol": "casePagination",
       "message": "Function 'casePagination' (68 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:casePagination",
@@ -355,7 +346,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 627,
+      "line_number": 628,
       "symbol": "caseDeterministicOrder",
       "message": "Function 'caseDeterministicOrder' (71 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:caseDeterministicOrder",
@@ -364,7 +355,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 704,
+      "line_number": 705,
       "message": "Legacy panic invocation in production code path",
       "anchor": "fn:mustNormalize",
       "fingerprint": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go:HISS-07:fn:mustNormalize#1"
@@ -372,7 +363,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go",
-      "line_number": 748,
+      "line_number": 757,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:caseContext.startHTTPBrokerProcess",
       "fingerprint": "tools/knowledge-mcp/cmd/mcp01-acceptance/cases.go:HISS-07:fn:caseContext.startHTTPBrokerProcess#1"
@@ -663,27 +654,9 @@
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-04:fn:insertProjectionRows#1"
     },
     {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 562,
-      "symbol": "openRegistryProjection",
-      "message": "Function 'openRegistryProjection' (61 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:openRegistryProjection",
-      "fingerprint": "tools/knowledge-mcp/projection.go:HISS-04:fn:openRegistryProjection#1"
-    },
-    {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 650,
-      "symbol": "validate",
-      "message": "Function 'validate' (96 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:registryProjection.validate",
-      "fingerprint": "tools/knowledge-mcp/projection.go:HISS-04:fn:registryProjection.validate#1"
-    },
-    {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 797,
+      "line_number": 822,
       "message": "Legacy panic invocation in production code path",
       "anchor": "fn:parseProjectionSchemaSQL",
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:parseProjectionSchemaSQL#1"
@@ -691,7 +664,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 801,
+      "line_number": 826,
       "message": "Legacy panic invocation in production code path",
       "anchor": "fn:parseProjectionSchemaSQL",
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:parseProjectionSchemaSQL#2"
@@ -699,7 +672,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1008,
+      "line_number": 1031,
       "symbol": "publishPair",
       "message": "Function 'publishPair' (106 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:projectionPublisher.publishPair",
@@ -708,7 +681,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1055,
+      "line_number": 1078,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:projectionPublisher.publishPair",
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:projectionPublisher.publishPair#1"
@@ -716,15 +689,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1139,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:projectionPublisher.stagePrivateFile",
-      "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:projectionPublisher.stagePrivateFile#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1200,
+      "line_number": 1221,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:projectionPublisher.removeTargetIfStageLink",
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:projectionPublisher.removeTargetIfStageLink#1"
@@ -732,7 +697,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1207,
+      "line_number": 1228,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:projectionPublisher.removeStageIfSame",
       "fingerprint": "tools/knowledge-mcp/projection.go:HISS-07:fn:projectionPublisher.removeStageIfSame#1"
@@ -740,7 +705,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1428,
+      "line_number": 1449,
       "symbol": "searchComponents",
       "message": "Function 'searchComponents' (105 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:registryProjection.searchComponents",
@@ -749,7 +714,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/projection.go",
-      "line_number": 1650,
+      "line_number": 1671,
       "symbol": "relationships",
       "message": "Function 'relationships' (105 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:registryProjection.relationships",
@@ -767,7 +732,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 74,
+      "line_number": 75,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:emitPublishRecord",
       "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:emitPublishRecord#1"
@@ -775,25 +740,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 399,
-      "symbol": "writePublishBundle",
-      "message": "Function 'writePublishBundle' (62 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:writePublishBundle",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-04:fn:writePublishBundle#1"
-    },
-    {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 497,
-      "symbol": "materializePublishBundle",
-      "message": "Function 'materializePublishBundle' (83 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:materializePublishBundle",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-04:fn:materializePublishBundle#1"
-    },
-    {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 666,
+      "line_number": 700,
       "symbol": "extractPublishBundle",
       "message": "Function 'extractPublishBundle' (71 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:extractPublishBundle",
@@ -802,51 +749,11 @@
     {
       "rule_id": "HISS-02",
       "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 696,
+      "line_number": 730,
       "symbol": "extractPublishBundle",
       "message": "Unbounded for loop without an exit condition (for {} / for ;; )",
       "anchor": "fn:extractPublishBundle",
       "fingerprint": "tools/knowledge-mcp/publish.go:HISS-02:fn:extractPublishBundle#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 850,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:sealDirectoryTree",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:sealDirectoryTree#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 860,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:sealDirectoryTree",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:sealDirectoryTree#2"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 865,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:unsealDirectoryTree",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:unsealDirectoryTree#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 870,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:unsealDirectoryTree",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:unsealDirectoryTree#2"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-mcp/publish.go",
-      "line_number": 893,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:writePublishStatus",
-      "fingerprint": "tools/knowledge-mcp/publish.go:HISS-07:fn:writePublishStatus#1"
     },
     {
       "rule_id": "HISS-02",
@@ -860,7 +767,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/registry.go",
-      "line_number": 709,
+      "line_number": 707,
       "symbol": "validateManifest",
       "message": "Function 'validateManifest' (118 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:validateManifest",
@@ -869,7 +776,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/registry.go",
-      "line_number": 1123,
+      "line_number": 1121,
       "symbol": "verifyReceiptAuthorization",
       "message": "Function 'verifyReceiptAuthorization' (68 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:verifyReceiptAuthorization",
@@ -878,7 +785,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/registry.go",
-      "line_number": 1359,
+      "line_number": 1352,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:boundedBuffer.Write",
       "fingerprint": "tools/knowledge-mcp/registry.go:HISS-07:fn:boundedBuffer.Write#1"
@@ -886,7 +793,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/registry.go",
-      "line_number": 1524,
+      "line_number": 1517,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:cloneJSONMap",
       "fingerprint": "tools/knowledge-mcp/registry.go:HISS-07:fn:cloneJSONMap#1"
@@ -894,7 +801,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/retrieval.go",
-      "line_number": 157,
+      "line_number": 156,
       "symbol": "search",
       "message": "Function 'search' (115 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:retrievalProvider.search",
@@ -903,7 +810,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-mcp/retrieval.go",
-      "line_number": 195,
+      "line_number": 194,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:retrievalProvider.search",
       "fingerprint": "tools/knowledge-mcp/retrieval.go:HISS-07:fn:retrievalProvider.search#1"
@@ -911,7 +818,7 @@
     {
       "rule_id": "HISS-02",
       "file_path": "tools/knowledge-mcp/retrieval.go",
-      "line_number": 228,
+      "line_number": 227,
       "symbol": "retrievalProvider.search",
       "message": "Context without a deadline reaches a call; derive it with context.WithTimeout or context.WithDeadline",
       "anchor": "fn:retrievalProvider.search",
@@ -920,7 +827,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-mcp/retrieval.go",
-      "line_number": 298,
+      "line_number": 297,
       "symbol": "validateCurrentRetrievalResponse",
       "message": "Function 'validateCurrentRetrievalResponse' (89 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:validateCurrentRetrievalResponse",
@@ -2618,6 +2525,14 @@
       "fingerprint": "tools/knowledge-registry/p1-src03-acquisition-runner/verify_execution_manifest.py:HISS-04:fn:validate_manifest_semantics#1"
     },
     {
+      "rule_id": "HISS-02",
+      "file_path": "tools/knowledge-registry/p1-src03-acquisition-runner/verify_execution_manifest.py",
+      "line_number": 353,
+      "message": "Python subprocess.run call passes no timeout=: explicit deadline on every I/O call",
+      "anchor": "fn:verify_toolchain",
+      "fingerprint": "tools/knowledge-registry/p1-src03-acquisition-runner/verify_execution_manifest.py:HISS-02:fn:verify_toolchain#1"
+    },
+    {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/p1-src03-acquisition-runner/verify_execution_manifest.py",
       "line_number": 325,
@@ -2674,7 +2589,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/snapshot_receipts_offline.py",
-      "line_number": 167,
+      "line_number": 170,
       "symbol": "main",
       "message": "Function 'main' (88 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:main",
@@ -2796,31 +2711,6 @@
       "message": "Function 'validatePlanRequest' (76 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:validatePlanRequest",
       "fingerprint": "tools/knowledge-registry/source-acquisition-plan-enumerator/enumerator.go:HISS-04:fn:validatePlanRequest#1"
-    },
-    {
-      "rule_id": "HISS-04",
-      "file_path": "tools/knowledge-registry/source-acquisition-plan-enumerator/enumerator.go",
-      "line_number": 544,
-      "symbol": "getJSON",
-      "message": "Function 'getJSON' (71 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
-      "anchor": "fn:enumerator.getJSON",
-      "fingerprint": "tools/knowledge-registry/source-acquisition-plan-enumerator/enumerator.go:HISS-04:fn:enumerator.getJSON#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-registry/source-acquisition-plan-enumerator/enumerator.go",
-      "line_number": 570,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:enumerator.getJSON",
-      "fingerprint": "tools/knowledge-registry/source-acquisition-plan-enumerator/enumerator.go:HISS-07:fn:enumerator.getJSON#1"
-    },
-    {
-      "rule_id": "HISS-07",
-      "file_path": "tools/knowledge-registry/source-acquisition-plan-enumerator/main.go",
-      "line_number": 127,
-      "message": "Legacy unchecked error assignment",
-      "anchor": "fn:writeExclusive",
-      "fingerprint": "tools/knowledge-registry/source-acquisition-plan-enumerator/main.go:HISS-07:fn:writeExclusive#1"
     },
     {
       "rule_id": "HISS-01",
@@ -3094,7 +2984,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 71,
+      "line_number": 74,
       "symbol": "fixture_files",
       "message": "Function 'fixture_files' (68 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.fixture_files",
@@ -3103,7 +2993,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 195,
+      "line_number": 198,
       "symbol": "reviewed_record",
       "message": "Function 'reviewed_record' (65 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.reviewed_record",
@@ -3112,7 +3002,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 631,
+      "line_number": 636,
       "symbol": "test_malformed_oci_references_are_opaque_gapped_placeholders",
       "message": "Function 'test_malformed_oci_references_are_opaque_gapped_placeholders' (107 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_malformed_oci_references_are_opaque_gapped_placeholders",
@@ -3121,7 +3011,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 739,
+      "line_number": 744,
       "symbol": "test_live_malformed_desired_image_never_infers_runtime_repository",
       "message": "Function 'test_live_malformed_desired_image_never_infers_runtime_repository' (75 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_live_malformed_desired_image_never_infers_runtime_repository",
@@ -3130,7 +3020,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 815,
+      "line_number": 820,
       "symbol": "test_live_desired_image_evidence_resolves_for_every_workload_kind",
       "message": "Function 'test_live_desired_image_evidence_resolves_for_every_workload_kind' (73 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_live_desired_image_evidence_resolves_for_every_workload_kind",
@@ -3139,7 +3029,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 1503,
+      "line_number": 1508,
       "symbol": "test_identity_provenance_does_not_downgrade_a_test_fixture_ref",
       "message": "Function 'test_identity_provenance_does_not_downgrade_a_test_fixture_ref' (61 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_identity_provenance_does_not_downgrade_a_test_fixture_ref",
@@ -3148,7 +3038,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 1583,
+      "line_number": 1588,
       "symbol": "test_chart_template_images_resolve_from_the_charts_own_values",
       "message": "Function 'test_chart_template_images_resolve_from_the_charts_own_values' (62 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_chart_template_images_resolve_from_the_charts_own_values",
@@ -3157,7 +3047,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 1776,
+      "line_number": 1781,
       "symbol": "test_repo_gvk_metadata_is_group_qualified_and_merges_with_live",
       "message": "Function 'test_repo_gvk_metadata_is_group_qualified_and_merges_with_live' (66 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_repo_gvk_metadata_is_group_qualified_and_merges_with_live",
@@ -3166,7 +3056,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 1909,
+      "line_number": 1914,
       "symbol": "test_reviewed_uri_safety_rejects_encoded_credentials_and_is_bounded",
       "message": "Function 'test_reviewed_uri_safety_rejects_encoded_credentials_and_is_bounded' (96 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_reviewed_uri_safety_rejects_encoded_credentials_and_is_bounded",
@@ -3175,7 +3065,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2006,
+      "line_number": 2011,
       "symbol": "test_reviewed_formats_uri_repertoire_and_temporal_intervals_are_strict",
       "message": "Function 'test_reviewed_formats_uri_repertoire_and_temporal_intervals_are_strict' (83 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_reviewed_formats_uri_repertoire_and_temporal_intervals_are_strict",
@@ -3184,7 +3074,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2090,
+      "line_number": 2095,
       "symbol": "test_candidate_locator_safety_covers_typed_keys_and_endpoint_roles",
       "message": "Function 'test_candidate_locator_safety_covers_typed_keys_and_endpoint_roles' (105 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_candidate_locator_safety_covers_typed_keys_and_endpoint_roles",
@@ -3193,7 +3083,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2257,
+      "line_number": 2262,
       "symbol": "test_sbom_root_topology_and_duplicate_refs_fail_closed",
       "message": "Function 'test_sbom_root_topology_and_duplicate_refs_fail_closed' (93 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_sbom_root_topology_and_duplicate_refs_fail_closed",
@@ -3202,7 +3092,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2351,
+      "line_number": 2356,
       "symbol": "test_sbom_hash_identity_uses_exact_source_sha256_and_rejects_conflict",
       "message": "Function 'test_sbom_hash_identity_uses_exact_source_sha256_and_rejects_conflict' (95 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_sbom_hash_identity_uses_exact_source_sha256_and_rejects_conflict",
@@ -3211,7 +3101,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2521,
+      "line_number": 2526,
       "symbol": "test_kubeconfig_is_bound_and_rejects_plugins_or_symlinks",
       "message": "Function 'test_kubeconfig_is_bound_and_rejects_plugins_or_symlinks' (91 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_kubeconfig_is_bound_and_rejects_plugins_or_symlinks",
@@ -3220,7 +3110,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2662,
+      "line_number": 2667,
       "symbol": "test_v3_receipt_is_exact_bounded_temporal_and_static_surface_closed",
       "message": "Function 'test_v3_receipt_is_exact_bounded_temporal_and_static_surface_closed' (87 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_v3_receipt_is_exact_bounded_temporal_and_static_surface_closed",
@@ -3229,7 +3119,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2795,
+      "line_number": 2800,
       "symbol": "test_openapi_endpoint_gvk_binding_rejects_swaps_and_allows_shared_valid_doc",
       "message": "Function 'test_openapi_endpoint_gvk_binding_rejects_swaps_and_allows_shared_valid_doc' (74 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_openapi_endpoint_gvk_binding_rejects_swaps_and_allows_shared_valid_doc",
@@ -3238,7 +3128,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2870,
+      "line_number": 2875,
       "symbol": "test_identical_endpoint_projections_share_one_input_and_keep_all_mappings",
       "message": "Function 'test_identical_endpoint_projections_share_one_input_and_keep_all_mappings' (96 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_identical_endpoint_projections_share_one_input_and_keep_all_mappings",
@@ -3247,7 +3137,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 2967,
+      "line_number": 2972,
       "symbol": "test_fatal_capture_failure_removes_unreceipted_artifacts",
       "message": "Function 'test_fatal_capture_failure_removes_unreceipted_artifacts' (64 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_fatal_capture_failure_removes_unreceipted_artifacts",
@@ -3256,7 +3146,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3032,
+      "line_number": 3037,
       "symbol": "test_input_preflight_rejects_multiplication_and_aggregate_before_reads",
       "message": "Function 'test_input_preflight_rejects_multiplication_and_aggregate_before_reads' (61 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_input_preflight_rejects_multiplication_and_aggregate_before_reads",
@@ -3265,7 +3155,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3147,
+      "line_number": 3152,
       "symbol": "test_kubeconfig_json_plugins_flow_yaml_and_sealed_source_races_fail_closed",
       "message": "Function 'test_kubeconfig_json_plugins_flow_yaml_and_sealed_source_races_fail_closed' (74 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_kubeconfig_json_plugins_flow_yaml_and_sealed_source_races_fail_closed",
@@ -3274,7 +3164,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3222,
+      "line_number": 3227,
       "symbol": "test_safe_projection_omits_literals_rejects_unsafe_uris_and_bounds_gvks",
       "message": "Function 'test_safe_projection_omits_literals_rejects_unsafe_uris_and_bounds_gvks' (290 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_safe_projection_omits_literals_rejects_unsafe_uris_and_bounds_gvks",
@@ -3283,7 +3173,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3513,
+      "line_number": 3518,
       "symbol": "test_container_status_projection_omits_only_empty_locators",
       "message": "Function 'test_container_status_projection_omits_only_empty_locators' (66 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_container_status_projection_omits_only_empty_locators",
@@ -3292,7 +3182,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3658,
+      "line_number": 3663,
       "symbol": "sbom_page_payload",
       "message": "Function 'sbom_page_payload' (64 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.sbom_page_payload",
@@ -3301,7 +3191,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 3800,
+      "line_number": 3805,
       "symbol": "test_v4_page_closure_fails_on_missing_extra_and_misfiled_pages",
       "message": "Function 'test_v4_page_closure_fails_on_missing_extra_and_misfiled_pages' (72 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_v4_page_closure_fails_on_missing_extra_and_misfiled_pages",
@@ -3310,7 +3200,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 4101,
+      "line_number": 4106,
       "symbol": "test_recorded_capture_generator_replays_after_head_advance",
       "message": "Function 'test_recorded_capture_generator_replays_after_head_advance' (69 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_recorded_capture_generator_replays_after_head_advance",
@@ -3319,7 +3209,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 4219,
+      "line_number": 4224,
       "symbol": "test_oci_platform_is_preserved_or_a_typed_identity_gap",
       "message": "Function 'test_oci_platform_is_preserved_or_a_typed_identity_gap' (110 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:RegistryTest.test_oci_platform_is_preserved_or_a_typed_identity_gap",
@@ -3328,7 +3218,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 5418,
+      "line_number": 5423,
       "symbol": "research_policy_payload",
       "message": "Function 'research_policy_payload' (85 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW0Test.research_policy_payload",
@@ -3337,7 +3227,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 5504,
+      "line_number": 5509,
       "symbol": "test_component_table_policy_end_to_end",
       "message": "Function 'test_component_table_policy_end_to_end' (74 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW0Test.test_component_table_policy_end_to_end",
@@ -3346,7 +3236,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 5695,
+      "line_number": 5700,
       "symbol": "kubernetes_baseline",
       "message": "Function 'kubernetes_baseline' (101 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW2Test.kubernetes_baseline",
@@ -3355,7 +3245,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 5797,
+      "line_number": 5802,
       "symbol": "test_kubernetes_policy_closes_gvk_and_crd_identities",
       "message": "Function 'test_kubernetes_policy_closes_gvk_and_crd_identities' (68 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW2Test.test_kubernetes_policy_closes_gvk_and_crd_identities",
@@ -3364,7 +3254,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 6428,
+      "line_number": 6433,
       "symbol": "test_identity_candidates_recover_w3_grammars",
       "message": "Function 'test_identity_candidates_recover_w3_grammars' (63 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW3Test.test_identity_candidates_recover_w3_grammars",
@@ -3373,7 +3263,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 6492,
+      "line_number": 6497,
       "symbol": "w3_baseline",
       "message": "Function 'w3_baseline' (144 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW3Test.w3_baseline",
@@ -3382,7 +3272,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 6637,
+      "line_number": 6642,
       "symbol": "test_w3_policies_close_populations_and_fail_closed",
       "message": "Function 'test_w3_policies_close_populations_and_fail_closed' (88 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW3Test.test_w3_policies_close_populations_and_fail_closed",
@@ -3391,7 +3281,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_knowledge_registry.py",
-      "line_number": 6726,
+      "line_number": 6731,
       "symbol": "test_golang_v2_renders_whole_module_vanity_once",
       "message": "Function 'test_golang_v2_renders_whole_module_vanity_once' (66 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:ChannelClosureW3Test.test_golang_v2_renders_whole_module_vanity_once",
@@ -3463,9 +3353,9 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-registry/tests/test_p1_src03_acquisition_runner.py",
-      "line_number": 98,
+      "line_number": 99,
       "symbol": "test_runner_contract_receipt_and_proposal_validate_v2",
-      "message": "Function 'test_runner_contract_receipt_and_proposal_validate_v2' (147 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
+      "message": "Function 'test_runner_contract_receipt_and_proposal_validate_v2' (150 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:P1SRC03AcquisitionSchemaTest.test_runner_contract_receipt_and_proposal_validate_v2",
       "fingerprint": "tools/knowledge-registry/tests/test_p1_src03_acquisition_runner.py:HISS-04:fn:P1SRC03AcquisitionSchemaTest.test_runner_contract_receipt_and_proposal_validate_v2#1"
     },
@@ -4256,7 +4146,7 @@
     {
       "rule_id": "HISS-02",
       "file_path": "tools/knowledge-retrieval/util.go",
-      "line_number": 174,
+      "line_number": 173,
       "symbol": "validateNoSymlinkExistingPrefix",
       "message": "Unbounded for loop without an exit condition (for {} / for ;; )",
       "anchor": "fn:validateNoSymlinkExistingPrefix",
@@ -4265,9 +4155,9 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-retrieval/util.go",
-      "line_number": 205,
+      "line_number": 204,
       "symbol": "writeImmutableObject",
-      "message": "Function 'writeImmutableObject' (76 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
+      "message": "Function 'writeImmutableObject' (74 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:writeImmutableObject",
       "fingerprint": "tools/knowledge-retrieval/util.go:HISS-04:fn:writeImmutableObject#1"
     },
@@ -4625,16 +4515,16 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 214,
+      "line_number": 211,
       "symbol": "writeImmutable",
-      "message": "Function 'writeImmutable' (82 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
+      "message": "Function 'writeImmutable' (80 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:outputStore.writeImmutable",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-04:fn:outputStore.writeImmutable#1"
     },
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 277,
+      "line_number": 272,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.writeImmutable",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.writeImmutable#1"
@@ -4642,7 +4532,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 283,
+      "line_number": 278,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.writeImmutable",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.writeImmutable#2"
@@ -4650,7 +4540,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 290,
+      "line_number": 285,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.writeImmutable",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.writeImmutable#3"
@@ -4658,7 +4548,7 @@
     {
       "rule_id": "HISS-04",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 394,
+      "line_number": 388,
       "symbol": "commitStagedObject",
       "message": "Function 'commitStagedObject' (72 LOC) exceeds HISS-04 / NASA Rule 4 limit of 60 LOC",
       "anchor": "fn:outputStore.commitStagedObject",
@@ -4667,7 +4557,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 439,
+      "line_number": 433,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.commitStagedObject",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.commitStagedObject#1"
@@ -4675,7 +4565,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 445,
+      "line_number": 439,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.commitStagedObject",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.commitStagedObject#2"
@@ -4683,7 +4573,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 451,
+      "line_number": 445,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.commitStagedObject",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.commitStagedObject#3"
@@ -4691,7 +4581,7 @@
     {
       "rule_id": "HISS-07",
       "file_path": "tools/knowledge-snapshot/output_store.go",
-      "line_number": 457,
+      "line_number": 451,
       "message": "Legacy unchecked error assignment",
       "anchor": "fn:outputStore.commitStagedObject",
       "fingerprint": "tools/knowledge-snapshot/output_store.go:HISS-07:fn:outputStore.commitStagedObject#4"

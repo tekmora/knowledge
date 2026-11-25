@@ -37,6 +37,7 @@ def jparse(r):
     return None
 
 def run(cmd):
+    """Run cmd under a 600-second deadline; a timeout fails the evaluation."""
     try:
         return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired as error:

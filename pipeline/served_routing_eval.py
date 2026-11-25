@@ -29,6 +29,7 @@ def distinctive_topic(e):
     return topic(sorted(cands)[0]) if cands else ''
 
 def run(cmd):
+    """Run cmd under a 600-second deadline and capture its output."""
     return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
 
 def jparse(r):
