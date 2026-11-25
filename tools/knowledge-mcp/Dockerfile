@@ -1,10 +1,10 @@
-# syntax=docker/dockerfile:1.27@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+# syntax=docker/dockerfile:1.29@sha256:572cebbc2b15e6f84c077742952674889cb63cd5e9b80abdffcbe587b6f19183
 # archeion-knowledge-mcp — canonical read-only stdio MCP broker (REQ-006).
 # Build context: tools/knowledge-mcp/ (see apps/ai/knowledge-mcp/README.md
 # for the build+push runbook; this image has no network listener — the
 # broker speaks JSON-RPC over its own stdin/stdout only).
 
-FROM golang:1.27.1-alpine3.23@sha256:d9e2f2f07b10cc922da3e80e035c3058810b328d5aef82d2c63680967c5e2ec9 AS builder
+FROM golang:1.27.4-alpine3.23@sha256:f70850ef6ce341e8b6427f677049145d63c0b7ce002d4d7e3d464828b1b96dcd AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # transition receipt. Without it the broker fails closed on every signed store,
 # so openssh-client ships here too. `ldd /usr/bin/ssh-keygen` on this exact
 # base resolves libselinux, libcrypto and libpcre2-8 beyond glibc.
-FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc AS gitprovider
+FROM debian:bookworm-slim@sha256:e67eeead736ff7bbe258ef088bff683635c561b1fcfefad0806c1df4ab49ce0e AS gitprovider
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git openssh-client \
     && rm -rf /var/lib/apt/lists/*
