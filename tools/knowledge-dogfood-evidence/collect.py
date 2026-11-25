@@ -21,6 +21,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Callable
+from broker_image_digest import find_broker_image_digest
 
 SCHEMA_VERSION = "1.1.0"
 ARTIFACT_KIND = "knowledge_dogfood_evidence"
@@ -1592,7 +1593,7 @@ def collect_rollback(
 
     def git_digest() -> tuple[Any, str]:
         text = repo.git(["show", f"{SERVED_REF}:{BROKER_CHART_VALUES}"], timeout=60)
-        match = re.search(r"^image:\n(?:[ \t]+.*\n)*?[ \t]+digest:[ \t]*\"([^\"]+)\"", text, re.M)
+        match = find_broker_image_digest(text)
         if not match:
             raise ProbeError(
                 f"no image.digest found in {BROKER_CHART_VALUES} at {SERVED_REF}"
