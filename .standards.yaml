@@ -48,6 +48,12 @@ exceptions:
     expires: "2027-03-25"
     category: D
     entered: "2026-11-25"
+  - rule: go-test-netns
+    path: tools/knowledge-retrieval/go.mod
+    reason: category D; the lifecycle signing tests run the production ssh-keygen owner check (validateSSHKeygenBinary in lifecycle_signing.go), which needs uid 0 to own /usr/bin/ssh-keygen and every parent directory, while the race stage's bubblewrap user namespace shows host root as the overflow uid, so its signing tests fail on the wrapper alone; the module's only test server is the httptest stub in query_signal_materialize_test.go, and CI runs the same race tests outside the wrapper; revisit when the engine wrapper keeps host root visible to stat
+    expires: "2027-03-25"
+    category: D
+    entered: "2026-11-25"
   - rule: HISS-11
     path: .github/workflows/release.yml
     reason: adoption found the release workflows short of the declared supply chain (SLSA Build Level 3 declared, Level 0 measured; enforce_cosign without a cosign signing step; require_sbom without an SBOM step); raise them as docs/guides/releasing.md in Praetor describes, then remove this entry
