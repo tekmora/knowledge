@@ -420,7 +420,7 @@ func writePublishBundle(output string, manifest publishBundleManifest, sources m
 	if err := file.Close(); err != nil {
 		return "", removeFileError(err, temporary)
 	}
-	if err := os.Chmod(temporary, publishFileMode); err != nil {
+	if err := os.Chmod(temporary, publishFileMode); err != nil { // #nosec G302 -- 0o444 is the mode the bundle manifest records; the uid-65532 server reads these immutable files and no one may write them.
 		return "", removeFileError(err, temporary)
 	}
 	if err := os.Rename(temporary, output); err != nil {
@@ -534,7 +534,7 @@ func finishPublishMaterialization(target, staging string, status *publishStatus,
 }
 
 func preparePublishTarget(target, staging string) error {
-	if err := os.MkdirAll(target, publishDirMode); err != nil {
+	if err := os.MkdirAll(target, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
 		return fmt.Errorf("create publish target: %w", err)
 	}
 	if err := clearPublishedTrees(target); err != nil {
@@ -543,7 +543,7 @@ func preparePublishTarget(target, staging string) error {
 	if err := os.RemoveAll(staging); err != nil {
 		return err
 	}
-	return os.MkdirAll(staging, publishDirMode)
+	return os.MkdirAll(staging, publishDirMode) // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
 }
 
 func fetchAndExtractPublishBundle(configuration config, staging string) (*publishBundleManifest, string, error) {
@@ -703,7 +703,7 @@ func extractPublishBundle(bundlePath, payload string) (*publishBundleManifest, e
 		return nil, err
 	}
 	defer file.Close()
-	if err := os.MkdirAll(payload, publishDirMode); err != nil {
+	if err := os.MkdirAll(payload, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
 		return nil, err
 	}
 	reader := tar.NewReader(file)
@@ -805,7 +805,7 @@ func readBundleManifest(reader *tar.Reader) (*publishBundleManifest, error) {
 
 func extractBundleEntry(reader io.Reader, payload string, entry publishBundleEntry) error {
 	destination := filepath.Join(payload, filepath.FromSlash(entry.Path))
-	if err := os.MkdirAll(filepath.Dir(destination), publishDirMode); err != nil {
+	if err := os.MkdirAll(filepath.Dir(destination), publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
 		return err
 	}
 	file, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600) // #nosec G304 -- path comes from the operator publish configuration or the validated bundle entry and private staging directory.
@@ -827,7 +827,7 @@ func extractBundleEntry(reader io.Reader, payload string, entry publishBundleEnt
 	if hex.EncodeToString(digest.Sum(nil)) != entry.SHA256 {
 		return fmt.Errorf("bundle entry %q does not match its manifest digest", entry.Path)
 	}
-	return os.Chmod(destination, publishFileMode)
+	return os.Chmod(destination, publishFileMode) // #nosec G302 -- 0o444 is the mode the bundle manifest records; the uid-65532 server reads these immutable files and no one may write them.
 }
 
 // validateBundlePath refuses traversal, absolute paths, non-canonical paths and
@@ -869,14 +869,14 @@ func materializeTrustRoot(source, directory string) error {
 	if _, err := os.Stat(directory); err == nil {
 		return errors.New("bundle supplied its own trust directory")
 	}
-	if err := os.MkdirAll(directory, publishDirMode); err != nil {
+	if err := os.MkdirAll(directory, publishDirMode); err != nil { // #nosec G301 -- writable by the publisher only while staging; sealing sets the tree to 0o555 before the uid-65532 server reads it.
 		return err
 	}
 	destination := filepath.Join(directory, publishTrustFileName)
 	if err := os.WriteFile(destination, raw, 0o600); err != nil { // #nosec G703 -- destination is the fixed trust-file child of the private extraction directory.
 		return err
 	}
-	return os.Chmod(destination, publishFileMode)
+	return os.Chmod(destination, publishFileMode) // #nosec G302 -- 0o444 is the mode the bundle manifest records; the uid-65532 server reads these immutable files and no one may write them.
 }
 
 func sealDirectoryTree(root string) error {
