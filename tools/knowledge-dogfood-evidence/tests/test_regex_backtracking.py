@@ -20,6 +20,7 @@ from broker_image_digest import (  # noqa: E402
 
 class TestBrokerImageDigest(unittest.TestCase):
     def test_preserves_legacy_captures(self) -> None:
+        """The helper captures what the replaced inline pattern captured."""
         cases = (
             ('image:\n  digest: "sha256:first"\n', "sha256:first"),
             ('image:\n  nested:\n    digest: "sha256:nested"\n', "sha256:nested"),
@@ -40,6 +41,7 @@ class TestBrokerImageDigest(unittest.TestCase):
                 self.assertEqual(match.group(1) if match else None, expected)
 
     def test_long_missing_digest_returns_within_deadline(self) -> None:
+        """A long image block with no digest returns before the deadline."""
         self.assertIn(r"(?:[ \t][^\n]*\n)*?", BROKER_IMAGE_DIGEST_RE.pattern)
         subprocess.run(
             [
@@ -57,6 +59,7 @@ class TestBrokerImageDigest(unittest.TestCase):
         )
 
     def test_collector_uses_the_digest_helper(self) -> None:
+        """The rollback probe reads the digest through the helper."""
         values = 'image:\n  digest: "sha256:first"\n'
         repo = Mock(spec=collect.Repo)
         repo.git.return_value = values

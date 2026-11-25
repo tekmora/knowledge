@@ -11,4 +11,5 @@ BROKER_IMAGE_DIGEST_RE = re.compile(
 
 
 def find_broker_image_digest(text: str) -> re.Match[str] | None:
+    """Return the first quoted digest under the top-level image key, or None."""
     return BROKER_IMAGE_DIGEST_RE.search(text)
