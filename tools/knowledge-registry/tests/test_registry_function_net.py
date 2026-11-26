@@ -17,12 +17,12 @@ from typing import Any
 from unittest.mock import Mock, patch
 
 TOOL_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(TOOL_ROOT))
-
-import capture_live as live
-import knowledge_registry as kr
+with patch.object(sys, "path", [str(TOOL_ROOT), *sys.path]):
+    import capture_live as live
+    import knowledge_registry as kr
 
 Record = dict[str, Any]
+MAX_FIXTURE_ROWS = 4
 OBSERVED = "2026-01-02T03:04:05Z"
 LATER = "2026-01-02T03:04:06Z"
 DIGEST = "sha256:" + "a" * 64
@@ -41,7 +41,14 @@ def only(records: Mapping[str, Record]) -> Record:
 
 def gap_types(builder: kr.Builder) -> set[str]:
     """Collect the explicitly emitted gap types."""
-    return {gap["gap_type"] for gap in builder.extra_gaps.values()}
+    return {gap["gap_type"] for gap in fixture_rows(builder.extra_gaps)}
+
+
+def fixture_rows(records: Mapping[str, Record]) -> tuple[Record, ...]:
+    """Bound the builder tables inspected by fixture assertions."""
+    if len(records) > MAX_FIXTURE_ROWS:
+        raise AssertionError(f"builder table exceeds {MAX_FIXTURE_ROWS} fixture rows")
+    return tuple(records.values())
 
 
 def source_builder() -> tuple[kr.Builder, str]:
@@ -59,6 +66,8 @@ def local_builder() -> tuple[kr.Builder, str, str, str]:
 
 
 class FilesTestCase(unittest.TestCase):
+    """Build temporary files and patch the tracked-path cache on demand."""
+
     def setUp(self) -> None:
         """Create a fresh directory for fixture I/O."""
         temporary = tempfile.TemporaryDirectory()
@@ -81,6 +90,8 @@ class FilesTestCase(unittest.TestCase):
 
 
 class ScannerTests(FilesTestCase):
+    """Build temporary manifests, scripts, and scanner configuration files."""
+
     def test_normalize_codex_projection_references(self) -> None:
         """Canonicalize the projection argument while preserving unrelated byte spans."""
         projection = kr.CODEX_CANONICAL_PROJECTION_REF.replace(b"0" * 64, b"a" * 64)
@@ -94,6 +105,12 @@ class ScannerTests(FilesTestCase):
         )
         escaped = data.replace(b' "' + projection, b' "\\u002e' + projection[1:])
         self.assertEqual(kr.normalize_codex_projection_references(escaped), escaped)
+        unrelated = header + b'args = ["--projection", "fixtures/projection.json"]\n'
+        self.assertEqual(kr.normalize_codex_projection_references(unrelated), unrelated)
+        other_flag = data.replace(b'"--projection"', b'"--projection-other"')
+        self.assertEqual(
+            kr.normalize_codex_projection_references(other_flag), other_flag
+        )
         self.assertEqual(kr.normalize_codex_projection_references(b"\xff"), b"\xff")
 
     def test_scan_chart_lock(self) -> None:
@@ -125,11 +142,23 @@ class ScannerTests(FilesTestCase):
         self.assertEqual(gap["gap_type"], "helm-lock-version-mismatch")
         self.assertIn("Chart.yaml declares '1.2.3'", gap["message"])
 
+        elsewhere = text.replace("charts.example.org", "charts.example.net")
+        refused = kr.Builder()
+        kr.scan_chart_lock(refused, self.root, path, elsewhere.encode(), elsewhere)
+        gap = only(refused.extra_gaps)
+        self.assertEqual(gap["gap_type"], "helm-lock-repository-mismatch")
+        self.assertIn(
+            "from 'https://charts.example.net', declared as 'https://charts.example.org'",
+            gap["message"],
+        )
+        self.assertEqual(gap["evidence"], ["Chart.lock#L2", "Chart.yaml#L4"])
+
     def test_scan_pyproject(self) -> None:
         """Keep exact dependency pins and optional extras while ignoring ordinary strings."""
         text = (
             '[project]\nname = "app"\nversion = "1.2.3"\n'
             'description = "ordinary"\ndependencies = ["Example_Dep[extra]==2.3.4"]\n'
+            'requires-python = ">=3.11"\n'
         )
         path = self.write("pyproject.toml", text)
         builder = kr.Builder()
@@ -137,14 +166,23 @@ class ScannerTests(FilesTestCase):
             kr.scan_pyproject(builder, self.root, path, text.encode(), text)
         )
         self.assertEqual(
-            {row["name"] for row in builder.components.values()}, {"app", "example-dep"}
+            {row["name"] for row in fixture_rows(builder.components)},
+            {"app", "example-dep", "python", "python-stdlib"},
         )
-        occurrence = only(builder.occurrences)
+        observations = {row["role"]: row for row in fixture_rows(builder.occurrences)}
+        occurrence = observations["pyproject-dependency"]
         self.assertEqual(occurrence["evidence_locator"], "line:5:column:17")
         self.assertIs(occurrence["optional"], True)
         version = builder.versions[occurrence["component_version_id"]]
         self.assertEqual(
             (version["resolved_version"], version["constraint"]), ("2.3.4", "==2.3.4")
+        )
+        toolchain = observations["python-requires-version"]
+        self.assertEqual(toolchain["raw_value"], ">=3.11")
+        self.assertEqual(toolchain["evidence_locator"], "line:6")
+        self.assertEqual(toolchain["dependency_scope"], "build")
+        self.assertEqual(
+            builder.versions[toolchain["component_version_id"]]["constraint"], ">=3.11"
         )
 
     def test_scan_containerd_hosts(self) -> None:
@@ -152,22 +190,24 @@ class ScannerTests(FilesTestCase):
         text = (
             'server = "https://registry.example.org"\n'
             '[host."https://mirror.example.org"]\n'
-            'capabilities = ["pull"]\nunused = "ignore"\n'
+            'capabilities = ["pull"]\nskip_verify = false\nunused = "ignore"\n'
         )
         path = self.write("hosts.toml", text)
         builder = kr.Builder()
         self.assertIsNone(
             kr.scan_containerd_hosts(builder, self.root, path, text.encode(), text)
         )
-        occurrences = {row["role"]: row for row in builder.occurrences.values()}
+        occurrences = {row["role"]: row for row in fixture_rows(builder.occurrences)}
         mirror = occurrences["containerd-registry-mirror"]
-        self.assertEqual(mirror["metadata"], {"capabilities": ["pull"]})
+        self.assertEqual(
+            mirror["metadata"], {"capabilities": ["pull"], "skip_verify": False}
+        )
         self.assertEqual(mirror["evidence_locator"], "line:2")
         self.assertEqual(
             occurrences["containerd-registry-server"]["evidence_locator"], "line:1"
         )
         self.assertEqual(
-            {row["relationship"] for row in builder.edges.values()},
+            {row["relationship"] for row in fixture_rows(builder.edges)},
             {"configures", "routes-through"},
         )
         bad = kr.Builder()
@@ -179,7 +219,7 @@ class ScannerTests(FilesTestCase):
         """Sort remote tool names and skip local servers without URLs."""
         text = (
             '[mcp_servers.app]\nurl = "https://example.org/mcp"\n'
-            'enabled_tools = ["write", "read"]\nrequired = true\n'
+            'enabled_tools = ["write", "read"]\nrequired = true\nenabled = false\n'
             '[mcp_servers.local]\ncommand = "app"\n'
         )
         path = self.write("config.toml", text)
@@ -192,7 +232,7 @@ class ScannerTests(FilesTestCase):
         self.assertEqual(occurrence["dependency_scope"], "development")
         self.assertEqual(
             occurrence["metadata"],
-            {"enabled": True, "required": True, "enabled_tools": ["read", "write"]},
+            {"enabled": False, "required": True, "enabled_tools": ["read", "write"]},
         )
         bad = kr.Builder()
         kr.scan_codex_config(bad, self.root, path, b"[", "[")
@@ -201,24 +241,34 @@ class ScannerTests(FilesTestCase):
 
     def test_scan_script_dependencies(self) -> None:
         """Resolve sibling pins and flag optional imports without pins."""
-        text = "import yaml\n# import requests\nfrom jsonschema import validate\n"
+        text = (
+            "import yaml\n# import requests\nfrom jsonschema import validate\n"
+            'command = "optimum-cli export"\n'
+        )
         path = self.write("app.py", text)
-        self.write("requirements.txt", "PyYAML==1.2.3\n")
+        self.write("requirements.txt", "PyYAML==1.2.3\noptimum==2.3.4\n")
         self.track("app.py", "requirements.txt")
         builder = kr.Builder()
         self.assertIsNone(
             kr.scan_script_dependencies(builder, self.root, path, text.encode(), text)
         )
         occurrences = {
-            row["evidence_locator"]: row for row in builder.occurrences.values()
+            row["evidence_locator"]: row for row in fixture_rows(builder.occurrences)
         }
-        self.assertEqual(set(occurrences), {"line:1", "line:3"})
+        self.assertEqual(set(occurrences), {"line:1", "line:3", "line:4"})
         pinned = builder.versions[occurrences["line:1"]["component_version_id"]]
         self.assertEqual(pinned["resolved_version"], "1.2.3")
         self.assertEqual(
             pinned["evidence"], ["app.py#L1", "app.py#line:1", "requirements.txt#L1"]
         )
         self.assertTrue(occurrences["line:3"]["optional"])
+        export = occurrences["line:4"]
+        self.assertIs(export["optional"], False)
+        self.assertEqual(export["metadata"], {"distribution": "optimum"})
+        self.assertEqual(
+            builder.versions[export["component_version_id"]]["resolved_version"],
+            "2.3.4",
+        )
         self.assertEqual(gap_types(builder), {"script-dependency-pin-missing"})
 
     def test_add_workflow_manifest_install(self) -> None:
@@ -241,6 +291,7 @@ class ScannerTests(FilesTestCase):
         )
         occurrence = only(builder.occurrences)
         installed = builder.versions[occurrence["component_version_id"]]
+        self.assertEqual(installed["resolved_version"], "1.2.3")
         self.assertEqual(installed["evidence"], ["app/package.json"])
         self.assertEqual(installed["source_ref"], kr.file_hash(data))
         self.assertEqual(occurrence["raw_value"], "npm install:app/package.json")
@@ -261,6 +312,8 @@ class ScannerTests(FilesTestCase):
 
 
 class ObservationTests(unittest.TestCase):
+    """Build in-memory registry observations from minimal source payloads."""
+
     def test_add_model_artifact_observation(self) -> None:
         """Persist immutable model identity, lineage, and unresolved mutable refs."""
         builder, source, component, version = local_builder()
@@ -317,6 +370,30 @@ class ObservationTests(unittest.TestCase):
             },
         )
 
+    def test_add_model_artifact_observation_resolves_revision_without_digest(
+        self,
+    ) -> None:
+        """Resolve an immutable revision when no digest is supplied."""
+        builder, source, component, version = local_builder()
+        revision = "b" * 40
+        _, revision_only, _ = kr.add_model_artifact_observation(
+            builder,
+            source,
+            component,
+            version,
+            ecosystem="huggingface",
+            identity="example/app",
+            name="app",
+            locator="/model",
+            raw_value="example/app",
+            role="fixture-model",
+            revision=revision,
+        )
+        revision_row = builder.versions[revision_only]
+        self.assertEqual(revision_row["resolved_version"], revision)
+        self.assertNotIn("artifact_digest", revision_row)
+        self.assertEqual(revision_row["resolution_state"], "resolved")
+
     def test_json_walk(self) -> None:
         """Yield sorted object keys and escape pointer tokens while preserving list order."""
         payload = {"z": None, "a/b~": [1, {"x": False}]}
@@ -332,12 +409,26 @@ class ObservationTests(unittest.TestCase):
             ],
         )
         self.assertEqual(list(kr.json_walk([], "/prefix")), [("/prefix", [])])
+        singleton = [{"x": False}]
+        self.assertEqual(
+            list(kr.json_walk(singleton)),
+            [("/", singleton), ("/0", {"x": False}), ("/0/x", False)],
+        )
 
     def test_enforce_exact_live_projection(self) -> None:
         """Accept exact server versions and refuse extra fields or unsupported types."""
         payload = {"serverVersion": {"gitVersion": "v1.2.3"}}
         self.assertIsNone(
             kr.enforce_exact_live_projection(payload, "server-version", live)
+        )
+        resources = {
+            "apiVersion": "v1",
+            "kind": "APIResourceList",
+            "groupVersion": "widgets.example.org/v1",
+            "resources": [{"name": "widgets", "kind": "Widget", "namespaced": False}],
+        }
+        self.assertIsNone(
+            kr.enforce_exact_live_projection(resources, "APIResourceList", live)
         )
         with self.assertRaisesRegex(
             kr.RegistryInputError, "not the exact identity-only projection"
@@ -355,7 +446,12 @@ class ObservationTests(unittest.TestCase):
         payload = {
             "groupVersion": group_version,
             "resources": [
-                {"name": "widgets", "kind": "Widget", "namespaced": False},
+                {
+                    "name": "widgets",
+                    "kind": "Widget",
+                    "namespaced": False,
+                    "storageVersionHash": "example-storage-hash",
+                },
                 "invalid",
             ],
         }
@@ -370,6 +466,9 @@ class ObservationTests(unittest.TestCase):
         version = only(builder.versions)
         self.assertEqual(version["metadata"]["api_resource_name"], "widgets")
         self.assertIs(version["metadata"]["namespaced"], False)
+        self.assertEqual(
+            version["metadata"]["storage_version_hash"], "example-storage-hash"
+        )
         gap = only(builder.extra_gaps)
         self.assertEqual(gap["gap_type"], "live-api-discovery-invalid")
         self.assertEqual(gap["evidence"], ["input.json#/resources/1"])
@@ -387,23 +486,34 @@ class ObservationTests(unittest.TestCase):
         }
         payload = {
             "openapi": "3.0.0",
-            "components": {"schemas": {"example/item": schema}},
+            "components": {
+                "schemas": {
+                    "example/item": schema,
+                    "example/alternate": {
+                        "type": "object",
+                        "x-kubernetes-group-version-kind": [
+                            {"group": "", "version": "v1", "kind": "Alternate"}
+                        ],
+                    },
+                }
+            },
         }
         self.assertEqual(
             kr.import_openapi_v3_document(
                 builder, source, payload, endpoint="/openapi/v3/api/v1"
             ),
-            1,
+            2,
         )
-        version = only(builder.versions)
+        first, second = builder.occurrences.values()
+        self.assertEqual(first["raw_value"], "core/v1/Alternate")
+        self.assertEqual(second["raw_value"], "core/v1/Widget")
+        version = builder.versions[second["component_version_id"]]
         self.assertEqual(
             version["artifact_digest"], kr.file_hash(kr.canonical_json(schema).encode())
         )
         self.assertEqual(
             version["evidence"], ["input.json#/components/schemas/example~1item"]
         )
-        occurrence = only(builder.occurrences)
-        self.assertEqual(occurrence["raw_value"], "core/v1/Widget")
         self.assertEqual(
             kr.import_openapi_v3_document(builder, source, {}, endpoint="/openapi/v3"),
             0,
@@ -430,6 +540,10 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(occurrence["raw_value"], "example.org/v1/Widget")
         edge = only(builder.edges)
         self.assertEqual(edge["relationship"], "defines-api")
+        self.assertEqual(
+            builder.versions[edge["from_component_version_id"]]["source_ref"],
+            "example-id",
+        )
         version = builder.versions[occurrence["component_version_id"]]
         self.assertEqual(
             version["artifact_digest"], kr.file_hash(kr.canonical_json(schema).encode())
@@ -452,7 +566,7 @@ class ObservationTests(unittest.TestCase):
             "status": {"operationState": {"syncResult": {"revision": "1.2.4"}}},
         }
         self.assertIsNone(kr.import_argo_item(builder, source, item, 3))
-        occurrences = {row["role"]: row for row in builder.occurrences.values()}
+        occurrences = {row["role"]: row for row in fixture_rows(builder.occurrences)}
         parent = occurrences["live-argo-application"]
         child = occurrences["live-argo-helm-source"]
         self.assertEqual(parent["raw_value"], "argocd/app")
@@ -466,7 +580,7 @@ class ObservationTests(unittest.TestCase):
         )
         self.assertEqual(gap_types(builder), set())
 
-        item["status"]["operationState"]["syncResult"]["revisions"] = ["1.2.4", "1.2.5"]
+        item["status"]["sync"] = {"revisions": ["1.2.4", "1.2.5"]}
         bad, bad_source = source_builder()
         kr.import_argo_item(bad, bad_source, item, 3)
         gap = only(bad.extra_gaps)
@@ -517,6 +631,8 @@ def package_builder(
 
 
 class ChannelRecordTests(unittest.TestCase):
+    """Build reviewed channel and version records from in-memory policies."""
+
     def test_derived_channel(self) -> None:
         """Render available template channels and degrade unresolved templates."""
         builder, component, _ = package_builder()
@@ -564,6 +680,30 @@ class ChannelRecordTests(unittest.TestCase):
             },
         )
 
+    def test_derived_channel_cites_rendered_uri_in_gap(self) -> None:
+        """Cite a renderable URI that still needs verification."""
+        builder, component, _ = package_builder()
+        entry = policy_entry("https://example.org/{name}")
+        spec = entry["record"]["channels"][0]
+        spec.update(
+            disposition="derived-unverified",
+            gap_reason="pending verification",
+        )
+        record = kr.derived_component_record(
+            entry, builder.components[component], "pkg:pypi/app", "baseline", None
+        )
+        (channel,) = record["channels"]
+        self.assertEqual(
+            channel["gap"],
+            {
+                "state": "unresolved",
+                "reason": "pending verification",
+                "blocking": False,
+                "evidence": [f"derived-uri:{CHANNEL_URI}", entry["citation"]],
+                "next_action": "probe-wave",
+            },
+        )
+
     def test_component_table_channel(self) -> None:
         """Carry catalog provenance into available channels and explicit gaps."""
         builder, component, _ = package_builder()
@@ -589,6 +729,7 @@ class ChannelRecordTests(unittest.TestCase):
             row_set={"channels": [row]},
         )
         (channel,) = record["channels"]
+        self.assertEqual(channel["discovery_method"], "inferred")
         self.assertEqual(channel["version_strategy"], "catalog-only")
         self.assertEqual(channel["canonical_uri"], CHANNEL_URI)
         self.assertEqual(
@@ -623,9 +764,10 @@ class ChannelRecordTests(unittest.TestCase):
         builder, component, _ = package_builder()
         entry = policy_entry("{evidence_document}")
         live_pointer = "live-export:fixture.json#/items/0"
+        component_row = {**builder.components[component], "namespace": "example"}
         record = kr.derived_component_record(
             entry,
-            builder.components[component],
+            component_row,
             "pkg:pypi/app",
             "baseline",
             "input.json",
@@ -642,6 +784,7 @@ class ChannelRecordTests(unittest.TestCase):
             },
         )
         self.assertEqual(record["component"]["registry_identity"], "pkg:pypi/app")
+        self.assertEqual(record["component"]["namespace"], "example")
         self.assertEqual(record["component"]["registry_kind"], "library")
         self.assertEqual(record["component"]["kind"], "library")
         self.assertEqual((record["versions"], record["snapshots"]), ([], []))
@@ -674,6 +817,7 @@ class ChannelRecordTests(unittest.TestCase):
         selected = kr.snapshot_reviewed_version_entry(
             component,
             [
+                {**version, "component_version_id": "ver-later"},
                 {
                     **version,
                     "component_version_id": "ver-earlier",
@@ -717,6 +861,8 @@ class ChannelRecordTests(unittest.TestCase):
 
 
 class ManifestFixtureTestCase(FilesTestCase):
+    """Patch the registry's __file__ and draft202012_validator for fixture manifests."""
+
     def setUp(self) -> None:
         """Isolate generator files and the schema engine from behavioral tests."""
         super().setUp()
@@ -747,6 +893,10 @@ class ManifestFixtureTestCase(FilesTestCase):
 
     def write_receipts(self, *rows: Record) -> None:
         """Write the receipt JSONL consumed by registry binders."""
+        if len(rows) > MAX_FIXTURE_ROWS:
+            raise AssertionError(
+                f"receipt batch exceeds {MAX_FIXTURE_ROWS} fixture rows"
+            )
         self.write(
             "receipts/input.jsonl", "".join(json.dumps(row) + "\n" for row in rows)
         )
@@ -800,6 +950,8 @@ class ManifestFixtureTestCase(FilesTestCase):
 
 
 class ChannelWaveTests(ManifestFixtureTestCase):
+    """Build channel policy waves, snapshot receipts, and comparison manifests."""
+
     def test_derive_channel_records(self) -> None:
         """Emit matching records and samples and skip failed preconditions."""
         builder, component, _ = package_builder()
@@ -815,6 +967,7 @@ class ChannelWaveTests(ManifestFixtureTestCase):
         )
         ((name, sample),) = samples
         self.assertEqual(name, "sample-pypi.json")
+        self.assertEqual(sample["policy_path"], "policy.json")
         self.assertEqual(
             sample["entries"],
             [
@@ -843,7 +996,7 @@ class ChannelWaveTests(ManifestFixtureTestCase):
             kr.derive_channel_records({}, [entry])
 
     def test_channel_wave_gate(self) -> None:
-        """Accept the declared wave size and reject an unsatisfied match count."""
+        """Check the declared wave size and reject a component delta."""
         builder, _, _ = package_builder()
         baseline = builder.manifest()
         accepted = kr.channel_wave_gate(
@@ -868,6 +1021,22 @@ class ChannelWaveTests(ManifestFixtureTestCase):
                 "reclassified_accepted_slots": 0,
                 "expected_matched": 1,
             },
+        )
+
+        added = builder.add_component(
+            kind="library",
+            ecosystem="pypi",
+            name="other",
+            purl="pkg:pypi/other",
+            official_channel_required=False,
+        )
+        changed = kr.channel_wave_gate(
+            baseline, builder.manifest(), policies=[], expected_matched=0
+        )
+        self.assertIs(changed["pass"], False)
+        self.assertEqual(
+            changed["checks"]["zero-new-components"],
+            {"pass": False, "new_component_ids": [added], "removed_component_ids": []},
         )
 
     def test_bind_channel_snapshot_receipts(self) -> None:
@@ -905,6 +1074,28 @@ class ChannelWaveTests(ManifestFixtureTestCase):
         )
         self.assertEqual(snapshot["content_hash"], row["content_hash"])
         self.assertEqual(record["versions"][0]["observed_at"], OBSERVED)
+
+    def test_bind_channel_snapshot_receipts_rejects_uri_mismatch(self) -> None:
+        """Refuse a verified receipt with a known channel ID and a different URI."""
+        baseline, record, channel, _ = self.snapshot_fixture()
+        component = record["component"]["component_id"]
+        row = self.receipt("https://example.net/app", channel, b"fixture snapshot\n")
+        self.write_receipts(row)
+        summary = kr.bind_channel_snapshot_receipts(
+            [(component, record)], baseline, str(self.root)
+        )
+        self.assertEqual(summary["receipt_rows_rejected"], 0)
+        self.assertEqual(summary["channels_bound"], 0)
+        self.assertEqual(
+            summary["channels_unbound"],
+            [
+                {
+                    "channel_id": channel,
+                    "reason": "input.jsonl:1: receipt canonical_uri does not match the channel",
+                }
+            ],
+        )
+        self.assertEqual(record["snapshots"], [])
 
     def test_channel_snapshot_gate(self) -> None:
         """Require a traced snapshot for each bindable receipt."""
@@ -945,8 +1136,26 @@ class ChannelWaveTests(ManifestFixtureTestCase):
             },
         )
 
+        added_builder, _, added_id = package_builder(observed="1.2.4")
+        added = only(added_builder.versions)
+        changed = kr.seal_manifest({**merged, "versions": [*merged["versions"], added]})
+        drift = kr.channel_snapshot_gate(baseline, changed, receipts_dir=str(self.root))
+        self.assertIs(drift["pass"], False)
+        self.assertEqual(drift["checks"]["merged-valid"], {"pass": True, "errors": []})
+        self.assertEqual(
+            drift["checks"]["zero-new-versions"],
+            {
+                "pass": False,
+                "versions": 2,
+                "new_version_ids": [added_id],
+                "removed_version_ids": [],
+            },
+        )
+
 
 class IdentityTests(ManifestFixtureTestCase):
+    """Build Git and OCI receipts and compare control, treatment, and anchor manifests."""
+
     def test_bind_gitops_identity(self) -> None:
         """Bind a verified commit to a mutable ref without reminting the version."""
         builder = kr.Builder()
@@ -961,6 +1170,15 @@ class IdentityTests(ManifestFixtureTestCase):
         version = builder.add_version(
             component, source_ref="main", evidence=("input.json",)
         )
+        other = builder.add_component(
+            kind="git-repository",
+            ecosystem="git",
+            name="other",
+            identity="git:repository:other",
+            metadata={"self_repository": False},
+            official_channel_required=False,
+        )
+        builder.add_version(other, source_ref="main", evidence=("input.json",))
         baseline = builder.manifest()
         data = (
             f"tree {'a' * 40}\nauthor Example <app@example.org> 1767323045 +0000\n"
@@ -972,6 +1190,7 @@ class IdentityTests(ManifestFixtureTestCase):
             f"chn:fixture:{component}:source",
             data,
         )
+        row["channel_ids"].append(f"chn:fixture:{other}:source")
         row.update(media_type=kr.GITOPS_COMMIT_MEDIA_TYPE, upstream_ref=commit)
         self.write_receipts(row)
         fragment, summary = kr.bind_gitops_identity(
@@ -980,6 +1199,7 @@ class IdentityTests(ManifestFixtureTestCase):
         self.assertEqual(summary["observed_ref"], "main")
         self.assertEqual(summary["commits"], [commit])
         self.assertEqual(summary["versions_bound"], 1)
+        self.assertEqual(summary["skipped"], {"not-a-self-repository-component": 1})
         (bound,) = fragment["versions"]
         self.assertEqual(bound["component_version_id"], version)
         self.assertEqual(
@@ -1005,7 +1225,8 @@ class IdentityTests(ManifestFixtureTestCase):
         )
         baseline = builder.manifest()
         row = self.oci_receipt(version, "amd64")
-        self.write_receipts(row)
+        newer = {**row, "observed_at": LATER, "fetched_at": LATER}
+        self.write_receipts(newer, row)
         fragment, summary = kr.bind_oci_identity(baseline, str(self.root))
         self.assertEqual(summary["versions_bound"], 1)
         self.assertEqual(summary["planned_refs_unreceipted"], [])
@@ -1015,6 +1236,7 @@ class IdentityTests(ManifestFixtureTestCase):
         self.assertEqual(observation["resolved_digest"], row["content_hash"])
         self.assertEqual(observation["platforms"], ["linux/amd64"])
         self.assertEqual(observation["receipt_canonical_uri"], OCI_URI)
+        self.assertEqual(observation["observed_at"], LATER)
 
         conflicting = self.oci_receipt(version, "arm64")
         self.write_receipts(row, conflicting)
@@ -1062,8 +1284,29 @@ class IdentityTests(ManifestFixtureTestCase):
             [],
         )
 
+        anchor = kr.Builder().manifest()
+        drift = kr.identity_gate(
+            control,
+            treatment,
+            receipts_dir=str(self.root),
+            anchor=anchor,
+            expected_plan={"expected_new_version_ids": [new_version]},
+        )
+        self.assertIs(drift["pass"], False)
+        self.assertEqual(
+            drift["checks"]["generation-anchored"],
+            {
+                "pass": False,
+                "anchor_manifest_id": anchor["manifest_id"],
+                "control_identity_blocking": 0,
+                "violations": ["control components differ from the anchor generation"],
+            },
+        )
+
 
 class MergeTests(ManifestFixtureTestCase):
+    """Build manifest candidates and conflicting records for strict merges."""
+
     def test_strict_merge_candidate_value(self) -> None:
         """Union evidence and keep the latest timestamp while rejecting scalar conflicts."""
         left = {
@@ -1086,6 +1329,10 @@ class MergeTests(ManifestFixtureTestCase):
                 "metadata": {"observed_at": LATER},
                 "source_ref": "1.2.3",
             },
+        )
+        self.assertEqual(
+            kr.strict_merge_candidate_record("versions", "ver-fixture", right, left),
+            result,
         )
         with self.assertRaisesRegex(
             kr.RegistryInputError,
@@ -1138,9 +1385,40 @@ class MergeTests(ManifestFixtureTestCase):
             kr.RegistryInputError, "merge requires at least one candidate manifest"
         ):
             kr.merge_manifests([])
+        with self.assertRaisesRegex(
+            kr.RegistryInputError, "merge input 1 is invalid: schema_version must equal"
+        ):
+            kr.merge_manifests([older, {**newer, "schema_version": "invalid"}])
 
 
 class CommandTests(FilesTestCase):
+    """Build temporary CLI paths and capture registry and live helper output."""
+
+    def test_capture_live_main(self) -> None:
+        """Reject a non-UTC observation time before capture opens any inputs."""
+        output = self.root / "capture"
+        args = [
+            "--output-dir",
+            str(output),
+            "--kubeconfig",
+            str(self.root / "unused.yaml"),
+            "--git-commit",
+            "a" * 40,
+            "--observed-at",
+            "2026-01-02",
+        ]
+        with (
+            redirect_stdout(io.StringIO()) as stdout,
+            redirect_stderr(io.StringIO()) as stderr,
+        ):
+            self.assertEqual(live.main(args), 2)
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertEqual(
+            stderr.getvalue(),
+            "capture failed: observed-at must be an exact UTC second\n",
+        )
+        self.assertFalse(output.exists())
+
     def test_main(self) -> None:
         """Write canonical capabilities once and refuse an existing output file."""
         output = self.root / "capabilities.json"
